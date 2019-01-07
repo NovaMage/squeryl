@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2010 Maxime Lévesque
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,8 +18,10 @@ package org.squeryl
 
 import dsl.ast._
 import dsl._
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
 import java.sql.Timestamp
+import java.time._
+
 import org.squeryl.internals.FieldMapper
 
 @deprecated("the PrimitiveTypeMode companion object is deprecated, you should define a mix in the trait for your application. See : http://squeryl.org/0.9.6.html",
@@ -29,8 +31,8 @@ object PrimitiveTypeMode extends PrimitiveTypeMode
 private [squeryl] object InternalFieldMapper extends PrimitiveTypeMode
 
 trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
-    
-  
+
+
   // =========================== Non Numerical =========================== 
   implicit val stringTEF = PrimitiveTypeSupport.stringTEF
   implicit val optionStringTEF = PrimitiveTypeSupport.optionStringTEF
@@ -38,13 +40,23 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
   implicit val optionDateTEF = PrimitiveTypeSupport.optionDateTEF
   implicit val sqlDateTEF = PrimitiveTypeSupport.sqlDateTEF
   implicit val optionSqlDateTEF = PrimitiveTypeSupport.optionSqlDateTEF
+  implicit val localDateTEF = PrimitiveTypeSupport.localDateTEF
+  implicit val optionLocalDateTEF = PrimitiveTypeSupport.optionLocalDateTEF
+  implicit val localTimeTEF = PrimitiveTypeSupport.localTimeTEF
+  implicit val optionLocalTimeTEF = PrimitiveTypeSupport.optionLocalTimeTEF
   implicit val timestampTEF = PrimitiveTypeSupport.timestampTEF
   implicit val optionTimestampTEF = PrimitiveTypeSupport.optionTimestampTEF
+  implicit val localDateTimeTEF: TypedExpressionFactory[LocalDateTime, TLocalDateTime] with PrimitiveJdbcMapper[LocalDateTime] = PrimitiveTypeSupport.localDateTimeTEF
+  implicit val optionLocalDateTimeTEF = PrimitiveTypeSupport.optionLocalDateTimeTEF
+  implicit val offsetTimeTEF = PrimitiveTypeSupport.offsetTimeTEF
+  implicit val optionOffsetTimeTEF = PrimitiveTypeSupport.optionOffsetTimeTEF
+  implicit val offsetDateTimeTEF = PrimitiveTypeSupport.offsetDateTimeTEF
+  implicit val optionOffsetDateTimeTEF = PrimitiveTypeSupport.optionOffsetDateTimeTEF
   implicit val doubleArrayTEF = PrimitiveTypeSupport.doubleArrayTEF
   implicit val intArrayTEF = PrimitiveTypeSupport.intArrayTEF
   implicit val longArrayTEF = PrimitiveTypeSupport.longArrayTEF
   implicit val stringArrayTEF = PrimitiveTypeSupport.stringArrayTEF
-  
+
   // =========================== Numerical Integral =========================== 
   implicit val byteTEF = PrimitiveTypeSupport.byteTEF
   implicit val optionByteTEF = PrimitiveTypeSupport.optionByteTEF
@@ -52,24 +64,39 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
   implicit val optionIntTEF = PrimitiveTypeSupport.optionIntTEF
   implicit val longTEF = PrimitiveTypeSupport.longTEF
   implicit val optionLongTEF = PrimitiveTypeSupport.optionLongTEF
-  
+
   // =========================== Numerical Floating Point ===========================   
   implicit val floatTEF = PrimitiveTypeSupport.floatTEF
   implicit val optionFloatTEF = PrimitiveTypeSupport.optionFloatTEF
   implicit val doubleTEF = PrimitiveTypeSupport.doubleTEF
-  implicit val optionDoubleTEF = PrimitiveTypeSupport.optionDoubleTEF  
+  implicit val optionDoubleTEF = PrimitiveTypeSupport.optionDoubleTEF
   implicit val bigDecimalTEF = PrimitiveTypeSupport.bigDecimalTEF
   implicit val optionBigDecimalTEF = PrimitiveTypeSupport.optionBigDecimalTEF
-  
-  
-  implicit def stringToTE(s: String) = stringTEF.create(s)  
+
+
+  implicit def stringToTE(s: String) = stringTEF.create(s)
   implicit def optionStringToTE(s: Option[String]) = optionStringTEF.create(s)
 
   implicit def dateToTE(s: Date) = dateTEF.create(s)
   implicit def optionDateToTE(s: Option[Date]) = optionDateTEF.create(s)
 
+  implicit def localDateToTE(s: LocalDate) = localDateTEF.create(s)
+  implicit def optionLocalDateToTE(s: Option[LocalDate]) = optionLocalDateTEF.create(s)
+
+  implicit def localTimeToTE(s: LocalTime) = localTimeTEF.create(s)
+  implicit def optionLocalTimeToTE(s: Option[LocalTime]) = optionLocalTimeTEF.create(s)
+
   implicit def timestampToTE(s: Timestamp) = timestampTEF.create(s)
   implicit def optionTimestampToTE(s: Option[Timestamp]) = optionTimestampTEF.create(s)
+
+  implicit def localDateTimeToTE(s: LocalDateTime) = localDateTimeTEF.create(s)
+  implicit def optionLocalDateTimeToTE(s: Option[LocalDateTime]) = optionLocalDateTimeTEF.create(s)
+
+  implicit def offsetTimeToTE(s: OffsetTime) = offsetTimeTEF.create(s)
+  implicit def optionOffsetTimeToTE(s: Option[OffsetTime]) = optionOffsetTimeTEF.create(s)
+
+  implicit def offsetDateTimeToTE(s: OffsetDateTime) = offsetDateTimeTEF.create(s)
+  implicit def optionOffsetDateTimeToTE(s: Option[OffsetDateTime]) = optionOffsetDateTimeTEF.create(s)
 
   implicit def booleanToTE(s: Boolean) = PrimitiveTypeSupport.booleanTEF.create(s)
   implicit def optionBooleanToTE(s: Option[Boolean]) = PrimitiveTypeSupport.optionBooleanTEF.create(s)
@@ -82,11 +109,11 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
 
   implicit def enumValueToTE[A >: Enumeration#Value <: Enumeration#Value](e: A): TypedExpression[A, TEnumValue[A]] =
     PrimitiveTypeSupport.enumValueTEF[A](e).create(e)
-    
+
   implicit def optionEnumcValueToTE[A >: Enumeration#Value <: Enumeration#Value](e: Option[A]): TypedExpression[Option[A], TOptionEnumValue[A]] =
     PrimitiveTypeSupport.optionEnumValueTEF[A](e).create(e)
-  
-  implicit def byteToTE(f: Byte) = byteTEF.create(f)    
+
+  implicit def byteToTE(f: Byte) = byteTEF.create(f)
   implicit def optionByteToTE(f: Option[Byte]) = optionByteTEF.create(f)
 
   implicit def intToTE(f: Int) = intTEF.create(f)
@@ -103,12 +130,12 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
 
   implicit def bigDecimalToTE(f: BigDecimal) = bigDecimalTEF.create(f)
   implicit def optionBigDecimalToTE(f: Option[BigDecimal]) = optionBigDecimalTEF.create(f)
-  
+
   implicit def doubleArrayToTE(f : Array[Double]) = doubleArrayTEF.create(f)
   implicit def intArrayToTE(f : Array[Int]) = intArrayTEF.create(f)
   implicit def longArrayToTE(f : Array[Long]) = longArrayTEF.create(f)
   implicit def stringArrayToTE(f: Array[String]) = stringArrayTEF.create(f)
-  
+
 
   implicit def logicalBooleanToTE(l: LogicalBoolean) =
     PrimitiveTypeSupport.booleanTEF.convert(l)
@@ -139,6 +166,32 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
   implicit def queryOptionDateMeasuredToTE(q: Query[Measures[Option[Date]]]) =
     new QueryValueExpressionNode[Option[Date], TOptionDate](q.copy(false, Nil).ast, optionDateTEF.createOutMapper)
 
+  implicit def queryLocalDateToTE(q: Query[LocalDate]) =
+    new QueryValueExpressionNode[LocalDate, TLocalDate](q.copy(false, Nil).ast, localDateTEF.createOutMapper)
+  implicit def queryOptionLocalDateToTE(q: Query[Option[LocalDate]]) =
+    new QueryValueExpressionNode[Option[LocalDate], TOptionLocalDate](q.copy(false, Nil).ast, optionLocalDateTEF.createOutMapper)
+  implicit def queryLocalDateGroupedToTE(q: Query[Group[LocalDate]]) =
+    new QueryValueExpressionNode[LocalDate, TLocalDate](q.copy(false, Nil).ast, localDateTEF.createOutMapper)
+  implicit def queryOptionLocalDateGroupedToTE(q: Query[Group[Option[LocalDate]]]) =
+    new QueryValueExpressionNode[Option[LocalDate], TOptionLocalDate](q.copy(false, Nil).ast, optionLocalDateTEF.createOutMapper)
+  implicit def queryLocalDateMeasuredToTE(q: Query[Measures[LocalDate]]) =
+    new QueryValueExpressionNode[LocalDate, TLocalDate](q.copy(false, Nil).ast, localDateTEF.createOutMapper)
+  implicit def queryOptionLocalDateMeasuredToTE(q: Query[Measures[Option[LocalDate]]]) =
+    new QueryValueExpressionNode[Option[LocalDate], TOptionLocalDate](q.copy(false, Nil).ast, optionLocalDateTEF.createOutMapper)
+
+  implicit def queryLocalTimeToTE(q: Query[LocalTime]) =
+    new QueryValueExpressionNode[LocalTime, TLocalTime](q.copy(false, Nil).ast, localTimeTEF.createOutMapper)
+  implicit def queryOptionLocalTimeToTE(q: Query[Option[LocalTime]]) =
+    new QueryValueExpressionNode[Option[LocalTime], TOptionLocalTime](q.copy(false, Nil).ast, optionLocalTimeTEF.createOutMapper)
+  implicit def queryLocalTimeGroupedToTE(q: Query[Group[LocalTime]]) =
+    new QueryValueExpressionNode[LocalTime, TLocalTime](q.copy(false, Nil).ast, localTimeTEF.createOutMapper)
+  implicit def queryOptionLocalTimeGroupedToTE(q: Query[Group[Option[LocalTime]]]) =
+    new QueryValueExpressionNode[Option[LocalTime], TOptionLocalTime](q.copy(false, Nil).ast, optionLocalTimeTEF.createOutMapper)
+  implicit def queryLocalTimeMeasuredToTE(q: Query[Measures[LocalTime]]) =
+    new QueryValueExpressionNode[LocalTime, TLocalTime](q.copy(false, Nil).ast, localTimeTEF.createOutMapper)
+  implicit def queryOptionLocalTimeMeasuredToTE(q: Query[Measures[Option[LocalTime]]]) =
+    new QueryValueExpressionNode[Option[LocalTime], TOptionLocalTime](q.copy(false, Nil).ast, optionLocalTimeTEF.createOutMapper)
+
   implicit def queryTimestampToTE(q: Query[Timestamp]) =
     new QueryValueExpressionNode[Timestamp, TTimestamp](q.copy(false, Nil).ast, timestampTEF.createOutMapper)
   implicit def queryOptionTimestampToTE(q: Query[Option[Timestamp]]) =
@@ -151,6 +204,45 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
     new QueryValueExpressionNode[Timestamp, TTimestamp](q.copy(false, Nil).ast, timestampTEF.createOutMapper)
   implicit def queryOptionTimestampMeasuredToTE(q: Query[Measures[Option[Timestamp]]]) =
     new QueryValueExpressionNode[Option[Timestamp], TOptionTimestamp](q.copy(false, Nil).ast, optionTimestampTEF.createOutMapper)
+
+  implicit def queryLocalDateTimeToTE(q: Query[LocalDateTime]) =
+    new QueryValueExpressionNode[LocalDateTime, TLocalDateTime](q.copy(false, Nil).ast, localDateTimeTEF.createOutMapper)
+  implicit def queryOptionLocalDateTimeToTE(q: Query[Option[LocalDateTime]]) =
+    new QueryValueExpressionNode[Option[LocalDateTime], TOptionLocalDateTime](q.copy(false, Nil).ast, optionLocalDateTimeTEF.createOutMapper)
+  implicit def queryLocalDateTimeGroupedToTE(q: Query[Group[LocalDateTime]]) =
+    new QueryValueExpressionNode[LocalDateTime, TLocalDateTime](q.copy(false, Nil).ast, localDateTimeTEF.createOutMapper)
+  implicit def queryOptionLocalDateTimeGroupedToTE(q: Query[Group[Option[LocalDateTime]]]) =
+    new QueryValueExpressionNode[Option[LocalDateTime], TOptionLocalDateTime](q.copy(false, Nil).ast, optionLocalDateTimeTEF.createOutMapper)
+  implicit def queryLocalDateTimeMeasuredToTE(q: Query[Measures[LocalDateTime]]) =
+    new QueryValueExpressionNode[LocalDateTime, TLocalDateTime](q.copy(false, Nil).ast, localDateTimeTEF.createOutMapper)
+  implicit def queryOptionLocalDateTimeMeasuredToTE(q: Query[Measures[Option[LocalDateTime]]]) =
+    new QueryValueExpressionNode[Option[LocalDateTime], TOptionLocalDateTime](q.copy(false, Nil).ast, optionLocalDateTimeTEF.createOutMapper)
+
+  implicit def queryOffsetTimeToTE(q: Query[OffsetTime]) =
+    new QueryValueExpressionNode[OffsetTime, TOffsetTime](q.copy(false, Nil).ast, offsetTimeTEF.createOutMapper)
+  implicit def queryOptionOffsetTimeToTE(q: Query[Option[OffsetTime]]) =
+    new QueryValueExpressionNode[Option[OffsetTime], TOptionOffsetTime](q.copy(false, Nil).ast, optionOffsetTimeTEF.createOutMapper)
+  implicit def queryOffsetTimeGroupedToTE(q: Query[Group[OffsetTime]]) =
+    new QueryValueExpressionNode[OffsetTime, TOffsetTime](q.copy(false, Nil).ast, offsetTimeTEF.createOutMapper)
+  implicit def queryOptionOffsetTimeGroupedToTE(q: Query[Group[Option[OffsetTime]]]) =
+    new QueryValueExpressionNode[Option[OffsetTime], TOptionOffsetTime](q.copy(false, Nil).ast, optionOffsetTimeTEF.createOutMapper)
+  implicit def queryOffsetTimeMeasuredToTE(q: Query[Measures[OffsetTime]]) =
+    new QueryValueExpressionNode[OffsetTime, TOffsetTime](q.copy(false, Nil).ast, offsetTimeTEF.createOutMapper)
+  implicit def queryOptionOffsetTimeMeasuredToTE(q: Query[Measures[Option[OffsetTime]]]) =
+    new QueryValueExpressionNode[Option[OffsetTime], TOptionOffsetTime](q.copy(false, Nil).ast, optionOffsetTimeTEF.createOutMapper)
+
+  implicit def queryOffsetDateTimeToTE(q: Query[OffsetDateTime]) =
+    new QueryValueExpressionNode[OffsetDateTime, TOffsetDateTime](q.copy(false, Nil).ast, offsetDateTimeTEF.createOutMapper)
+  implicit def queryOptionOffsetDateTimeToTE(q: Query[Option[OffsetDateTime]]) =
+    new QueryValueExpressionNode[Option[OffsetDateTime], TOptionOffsetDateTime](q.copy(false, Nil).ast, optionOffsetDateTimeTEF.createOutMapper)
+  implicit def queryOffsetDateTimeGroupedToTE(q: Query[Group[OffsetDateTime]]) =
+    new QueryValueExpressionNode[OffsetDateTime, TOffsetDateTime](q.copy(false, Nil).ast, offsetDateTimeTEF.createOutMapper)
+  implicit def queryOptionOffsetDateTimeGroupedToTE(q: Query[Group[Option[OffsetDateTime]]]) =
+    new QueryValueExpressionNode[Option[OffsetDateTime], TOptionOffsetDateTime](q.copy(false, Nil).ast, optionOffsetDateTimeTEF.createOutMapper)
+  implicit def queryOffsetDateTimeMeasuredToTE(q: Query[Measures[OffsetDateTime]]) =
+    new QueryValueExpressionNode[OffsetDateTime, TOffsetDateTime](q.copy(false, Nil).ast, offsetDateTimeTEF.createOutMapper)
+  implicit def queryOptionOffsetDateTimeMeasuredToTE(q: Query[Measures[Option[OffsetDateTime]]]) =
+    new QueryValueExpressionNode[Option[OffsetDateTime], TOptionOffsetDateTime](q.copy(false, Nil).ast, optionOffsetDateTimeTEF.createOutMapper)
 
   implicit def queryBooleanToTE(q: Query[Boolean]) =
     new QueryValueExpressionNode[Boolean, TBoolean](q.copy(false, Nil).ast, PrimitiveTypeSupport.booleanTEF.createOutMapper)
