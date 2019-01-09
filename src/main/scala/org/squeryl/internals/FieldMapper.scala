@@ -20,6 +20,7 @@ import java.sql.{ResultSet, Timestamp}
 import java.time._
 import java.util.{Date, UUID}
 
+import org.squeryl.TargetsValuesSupertype
 import org.squeryl.dsl.{ArrayJdbcMapper, _}
 
 import scala.collection.mutable.HashMap
@@ -400,7 +401,10 @@ trait FieldMapper {
 
   protected class FieldAttributesBasedOnType[A](val mapper: MapperForReflection, val defaultLength: Int, val sample: A, val nativeJdbcType: Class[_]) {
 
-    val clasz: Class[_] = sample.asInstanceOf[AnyRef].getClass
+    val clasz: Class[_] = {
+      val sampleClass = sample.asInstanceOf[AnyRef].getClass
+      if (classOf[TargetsValuesSupertype].isAssignableFrom(sampleClass)) sampleClass.getSuperclass else sampleClass
+    }
 
     override def toString =
       clasz.getCanonicalName + " --> " + mapper.getClass.getCanonicalName

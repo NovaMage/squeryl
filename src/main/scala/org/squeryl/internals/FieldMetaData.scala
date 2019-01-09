@@ -16,16 +16,19 @@
 package org.squeryl.internals
 
 import java.lang.annotation.Annotation
-import java.lang.reflect.{Field, Method, Constructor, InvocationTargetException, Type, ParameterizedType}
+import java.lang.reflect.{Constructor, Field, InvocationTargetException, Method, ParameterizedType, Type}
 import java.sql.ResultSet
+
 import scala.annotation.tailrec
-import org.squeryl.annotations.{ColumnBase, Column}
+import org.squeryl.annotations.{Column, ColumnBase}
+
 import collection.mutable.{HashMap, HashSet}
-import org.squeryl.Session
+import org.squeryl.{Session, TargetsValuesSupertype}
 import org.squeryl.dsl.CompositeKey
 import org.squeryl.customtypes.CustomType
 import org.json4s.scalap.scalasig._
 import java.lang.reflect.Member
+
 import org.squeryl.dsl.ast.ConstantTypedExpression
 import org.squeryl.customtypes.CustomType
 
@@ -205,7 +208,8 @@ class FieldMetaData(
   val resultSetHandler = createResultSetHandler
     
   if(!isCustomType)
-    assert(fieldType == wrappedFieldType,
+    assert(fieldType == wrappedFieldType ||
+      classOf[TargetsValuesSupertype].isAssignableFrom(fieldType) && fieldType.getSuperclass == wrappedFieldType,
       "expected fieldType == wrappedFieldType in primitive type mode, got "+
       fieldType.getName + " != " + wrappedFieldType.getName)
 
@@ -460,6 +464,7 @@ object FieldMetaData {
       }
 
       val primitiveFieldType = v match {
+        case sc: TargetsValuesSupertype => sc.getClass.getSuperclass
         case p: Product1[_] =>
           p._1.getClass
         case Some(x: Product1[_]) =>
