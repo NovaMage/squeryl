@@ -16,10 +16,14 @@
 package org.squeryl.internals
 
 import java.lang.annotation.Annotation
-import net.sf.cglib.proxy.{Callback, CallbackFilter, Enhancer, Factory, NoOp}
 
 import java.lang.reflect.{Constructor, Field, Member, Method, Modifier}
 import collection.mutable.{ArrayBuffer, HashSet}
+import net.bytebuddy.ByteBuddy
+import net.bytebuddy.description.modifier.Visibility
+import net.bytebuddy.matcher.ElementMatchers
+import net.bytebuddy.implementation.MethodDelegation
+import org.squeryl.dsl.ast.ViewExpressionNode
 import org.squeryl.annotations._
 import org.squeryl._
 
@@ -217,29 +221,42 @@ class PosoMetaData[T](val clasz: Class[T], val schema: Schema, val viewOrTable: 
     r.append((c, res))
   }
 
+  private def _noOptionalColumnDeclared =
+    org.squeryl.internals.Utils.throwError(
+      "class " + clasz.getName + " has an Option[] member with no Column annotation with optionType declared."
+    )
+
   // def createSamplePoso[T](vxn: ViewExpressionNode[T], classOfT: Class[T]): T = {
   // Enhancer.create(classOfT, new PosoPropertyAccessInterceptor(vxn)).asInstanceOf[T]
   // }
 
-  def createSample(cb: Callback) =
-    FieldReferenceLinker.executeAndRestoreLastAccessedFieldReference(_builder(cb))
+  def createSample(viewExpressionNode: ViewExpressionNode[_]): T =
+    FieldReferenceLinker.executeAndRestoreLastAccessedFieldReference(_builder(viewExpressionNode))
 
-  private[this] val _builder: (Callback) => T = {
+  private val _builder: ViewExpressionNode[_] => T = {
+    val klass = new ByteBuddy()
+      .subclass(clasz)
+      .method(
+        ElementMatchers.not(
+          ElementMatchers.isStatic().or(ElementMatchers.named("finalize").or(ElementMatchers.nameStartsWith("$")))
+        )
+      )
+      .intercept(
+        MethodDelegation.to(classOf[PosoPropertyAccessInterceptorShim])
+      )
+      .defineField(PosoMetaData.ViewExpressionNodeFieldName, classOf[ViewExpressionNode[_]], Visibility.PUBLIC)
+      .make()
+      .load(clasz.getClassLoader)
+      .getLoaded()
 
-    val e = new Enhancer
-    e.setSuperclass(clasz)
-    val pc: Array[Class[_]] = constructor._1.getParameterTypes
-    e.setUseFactory(true)
+    val myConstructor = klass.getConstructor(constructor._1.getParameterTypes: _*)
 
-    (callB: Callback) => {
+    val viewExpressionNodeField = klass.getDeclaredField(PosoMetaData.ViewExpressionNodeFieldName)
 
-      val cb = Array[Callback](callB, NoOp.INSTANCE)
-      e.setCallbacks(cb)
-      e.setCallbackFilter(PosoMetaData.finalizeFilter)
-      // TODO : are we creating am unnecessary instance ?
-      val fac = e.create(pc, constructor._2).asInstanceOf[Factory]
-
-      fac.newInstance(pc, constructor._2, cb).asInstanceOf[T]
+    (viewExpressionNode: ViewExpressionNode[_]) => {
+      val res = myConstructor.newInstance(constructor._2: _*).asInstanceOf[T]
+      viewExpressionNodeField.set(res, viewExpressionNode)
+      res
     }
   }
 
@@ -347,8 +364,6 @@ class PosoMetaData[T](val clasz: Class[T], val schema: Schema, val viewOrTable: 
 }
 
 object PosoMetaData {
-  val finalizeFilter = new CallbackFilter {
-    def accept(method: Method): Int =
-      if (method.getName == "finalize") 1 else 0
-  }
+  val InternalFieldPrefix: String = "$Squeryl$"
+  val ViewExpressionNodeFieldName = s"${InternalFieldPrefix}viewExpressionNode"
 }

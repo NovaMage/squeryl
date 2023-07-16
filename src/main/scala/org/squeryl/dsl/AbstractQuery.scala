@@ -255,7 +255,7 @@ abstract class AbstractQuery[R](
   protected def createSubQueryable[U](q: Queryable[U]): SubQueryable[U] = q match {
     case v: View[_] =>
       val vxn = v.viewExpressionNode
-      vxn.sample = v.posoMetaData.createSample(FieldReferenceLinker.createCallBack(vxn))
+      vxn.sample = v.posoMetaData.createSample(vxn)
 
       new SubQueryable(v, vxn.sample, vxn.resultSetMapper, false, vxn)
     case oqr: OptionalQueryable[U @unchecked] =>

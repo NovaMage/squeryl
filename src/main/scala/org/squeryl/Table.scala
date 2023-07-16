@@ -279,7 +279,7 @@ class Table[T] private[squeryl] (
   def update(s: T => UpdateStatement): Discardable[Int] = {
 
     val vxn = new ViewExpressionNode(this)
-    vxn.sample = posoMetaData.createSample(FieldReferenceLinker.createCallBack(vxn))
+    vxn.sample = posoMetaData.createSample(vxn)
     val us = s(vxn.sample)
     vxn.parent = Some(us)
 

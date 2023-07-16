@@ -15,8 +15,7 @@
  ***************************************************************************** */
 package org.squeryl.internals
 
-import net.sf.cglib.proxy._
-import collection.mutable.ArrayBuffer
+import collection.mutable.{HashSet, ArrayBuffer}
 import org.squeryl.dsl.ast._
 import org.squeryl.dsl.CompositeKey
 import org.squeryl.dsl.TypedExpression
@@ -280,7 +279,6 @@ object FieldReferenceLinker {
         // println("Looking at " + clazzName)
         if (
           !clazzName.startsWith("java.") &&
-          !clazzName.startsWith("net.sf.cglib.") &&
           !clazzName.startsWith("scala.Enumeration")
         ) {
           visited.put(o, o)
@@ -289,7 +287,8 @@ object FieldReferenceLinker {
             f.setAccessible(true);
             val ob = f.get(o)
             if (
-              !f.getName.startsWith("CGLIB$") &&
+              f.getName.indexOf("$ByteBuddy$") == -1 &&
+              !f.getName.startsWith(PosoMetaData.InternalFieldPrefix) &&
               !f.getType.getName.startsWith("scala.Function") &&
               !FieldMetaData.factory.hideFromYieldInspection(o, f)
             ) {
@@ -301,7 +300,7 @@ object FieldReferenceLinker {
     }
 
   private def _populateSelectCols(yi: YieldInspection, q: QueryExpressionElements, sample: AnyRef): Unit = {
-    val owner = _findQENThatOwns(sample, q)
+    var owner = _findQENThatOwns(sample, q)
     owner foreach { o =>
       for (e <- o.getOrCreateAllSelectElements(q))
         yi.addSelectElement(e)
@@ -320,37 +319,38 @@ object FieldReferenceLinker {
     q.filterDescendantsOfType[QueryableExpressionNode].find(_.owns(sample))
   }
 
-  def createCallBack(v: ViewExpressionNode[_]): Callback =
-    new PosoPropertyAccessInterceptor(v)
+  object PosoPropertyAccessInterceptor {
+    def fmd4Method(viewExpressionNode: ViewExpressionNode[_], m: Method) =
+      Option(viewExpressionNode).flatMap(_.view.findFieldMetaDataForProperty(m.getName))
 
-  private class PosoPropertyAccessInterceptor(val viewExpressionNode: ViewExpressionNode[_]) extends MethodInterceptor {
+    def intercept(o: Object, m: Method, args: Array[Object], superMethod: Method): Object = {
+      val viewExpressionNodeField = o.getClass().getDeclaredField(PosoMetaData.ViewExpressionNodeFieldName)
 
-    def fmd4Method(m: Method) =
-      viewExpressionNode.view.findFieldMetaDataForProperty(m.getName)
+      val viewExpressionNode = viewExpressionNodeField.get(o).asInstanceOf[ViewExpressionNode[_]]
 
-    def intercept(o: Object, m: Method, args: Array[Object], proxy: MethodProxy): Object = {
-
-      val fmd = fmd4Method(m)
+      val fmd = fmd4Method(viewExpressionNode, m)
       val yi = if (isYieldInspectionMode) _yieldInspectionTL.get else null
       val isComposite =
         classOf[CompositeKey].isAssignableFrom(m.getReturnType)
 
       try {
-        if (fmd.isDefined && yi != null)
+        if (fmd != None && yi != null)
           yi.incrementReentranceDepth
 
-        _intercept(o, m, args, proxy, fmd, yi, isComposite)
+        _intercept(viewExpressionNode, o, m, args, superMethod, fmd, yi, isComposite)
       } finally {
-        if (fmd.isDefined && yi != null)
+        if (fmd != None && yi != null)
           yi.decrementReentranceDepth
       }
+
     }
 
     private def _intercept(
+      viewExpressionNode: ViewExpressionNode[_],
       o: Object,
       m: Method,
       args: Array[Object],
-      proxy: MethodProxy,
+      superMethod: Method,
       fmd: Option[FieldMetaData],
       yi: YieldInspection,
       isComposite: Boolean
@@ -360,10 +360,11 @@ object FieldReferenceLinker {
         _compositeKeyMembers.set(Some(new ArrayBuffer[SelectElement]))
 
       val res =
-        if (m.getName.equals("toString") && m.getParameterTypes.length == 0)
+        if (m.getName.equals("toString") && m.getParameterTypes.length == 0 && (viewExpressionNode ne null))
           "sample:" + viewExpressionNode.view.name + "[" + Integer.toHexString(System.identityHashCode(o)) + "]"
-        else
-          proxy.invokeSuper(o, args);
+        else {
+          superMethod.invoke(o, args: _*);
+        }
 
       if (isComposite) {
         val ck = res.asInstanceOf[CompositeKey]
@@ -372,7 +373,7 @@ object FieldReferenceLinker {
         _compositeKeyMembers.remove()
       }
 
-      if (fmd.isDefined) {
+      if (fmd != None) {
 
         if (yi != null && yi.reentranceDepth == 1)
           yi.addSelectElement(viewExpressionNode.getOrCreateSelectElement(fmd.get, yi.queryExpressionNode))
@@ -386,5 +387,7 @@ object FieldReferenceLinker {
 
       res
     }
+
   }
+
 }
