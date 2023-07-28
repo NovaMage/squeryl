@@ -97,6 +97,10 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
   implicit def offsetTimeToTE(s: OffsetTime) = offsetTimeTEF.create(s)
   implicit def optionOffsetTimeToTE(s: Option[OffsetTime]) = optionOffsetTimeTEF.create(s)
 
+  implicit def instantToTE(s: Instant) = instantTEF.create(s)
+
+  implicit def optionInstantToTE(s: Option[Instant]) = optionInstantTEF.create(s)
+
   implicit def offsetDateTimeToTE(s: OffsetDateTime) = offsetDateTimeTEF.create(s)
   implicit def optionOffsetDateTimeToTE(s: Option[OffsetDateTime]) = optionOffsetDateTimeTEF.create(s)
 
