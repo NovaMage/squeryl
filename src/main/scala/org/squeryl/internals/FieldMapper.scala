@@ -116,6 +116,13 @@ trait FieldMapper {
       def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[OffsetTime])
     }
 
+    val instantTEF = new TypedExpressionFactory[Instant, TInstant] with PrimitiveJdbcMapper[Instant] {
+      val sample = Instant.now()
+      val defaultColumnLength = -1
+
+      def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[Instant])
+    }
+
     val offsetDateTimeTEF = new TypedExpressionFactory[OffsetDateTime, TOffsetDateTime] with PrimitiveJdbcMapper[OffsetDateTime] {
       val sample = OffsetDateTime.now()
       val defaultColumnLength = -1
@@ -133,6 +140,10 @@ trait FieldMapper {
 
     val optionOffsetTimeTEF = new TypedExpressionFactory[Option[OffsetTime], TOptionOffsetTime] with DeOptionizer[OffsetTime, OffsetTime, TOffsetTime, Option[OffsetTime], TOptionOffsetTime] {
       val deOptionizer = offsetTimeTEF
+    }
+
+    val optionInstantTEF = new TypedExpressionFactory[Option[Instant], TOptionInstant] with DeOptionizer[Instant, Instant, TInstant, Option[Instant], TOptionInstant] {
+      val deOptionizer = instantTEF
     }
 
     val optionOffsetDateTimeTEF = new TypedExpressionFactory[Option[OffsetDateTime], TOptionOffsetDateTime] with DeOptionizer[OffsetDateTime, OffsetDateTime, TOffsetDateTime, Option[OffsetDateTime], TOptionOffsetDateTime] {

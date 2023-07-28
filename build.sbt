@@ -4,8 +4,6 @@ description := "A Scala ORM and DSL for talking with Databases using minimum ver
 
 organization := "com.github.novamage"
 
-version := "0.9.18"
-
 //only release *if* -Drelease=true is passed to JVM
 version := {
   val v = version.value
