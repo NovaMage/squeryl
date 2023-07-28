@@ -130,6 +130,13 @@ trait FieldMapper {
       def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[OffsetDateTime])
     }
 
+    val zonedDateTimeTEF = new TypedExpressionFactory[ZonedDateTime, TZonedDateTime] with PrimitiveJdbcMapper[ZonedDateTime] {
+      val sample = ZonedDateTime.now()
+      val defaultColumnLength = -1
+
+      def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[ZonedDateTime])
+    }
+
     val optionTimestampTEF = new TypedExpressionFactory[Option[Timestamp], TOptionTimestamp] with DeOptionizer[Timestamp, Timestamp, TTimestamp, Option[Timestamp], TOptionTimestamp] {
       val deOptionizer = timestampTEF
     }
@@ -148,6 +155,10 @@ trait FieldMapper {
 
     val optionOffsetDateTimeTEF = new TypedExpressionFactory[Option[OffsetDateTime], TOptionOffsetDateTime] with DeOptionizer[OffsetDateTime, OffsetDateTime, TOffsetDateTime, Option[OffsetDateTime], TOptionOffsetDateTime] {
       val deOptionizer = offsetDateTimeTEF
+    }
+
+    val optionZonedDateTimeTEF = new TypedExpressionFactory[Option[ZonedDateTime], TOptionZonedDateTime] with DeOptionizer[ZonedDateTime, ZonedDateTime, TZonedDateTime, Option[ZonedDateTime], TOptionZonedDateTime] {
+      val deOptionizer = zonedDateTimeTEF
     }
 
     val booleanTEF = new TypedExpressionFactory[Boolean, TBoolean] with PrimitiveJdbcMapper[Boolean] {
@@ -352,14 +363,15 @@ trait FieldMapper {
     register(floatTEF)
     register(doubleTEF)
     register(bigDecimalTEF)
-
     register(binaryTEF)
     register(booleanTEF)
     register(stringTEF)
     register(timestampTEF)
     register(localDateTimeTEF)
     register(offsetTimeTEF)
+    register(instantTEF)
     register(offsetDateTimeTEF)
+    register(zonedDateTimeTEF)
     register(dateTEF)
     register(sqlDateTEF)
     register(localDateTEF)

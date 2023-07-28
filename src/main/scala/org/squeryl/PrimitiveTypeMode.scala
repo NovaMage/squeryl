@@ -54,6 +54,8 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
   implicit val optionInstantTEF = PrimitiveTypeSupport.optionInstantTEF
   implicit val offsetDateTimeTEF = PrimitiveTypeSupport.offsetDateTimeTEF
   implicit val optionOffsetDateTimeTEF = PrimitiveTypeSupport.optionOffsetDateTimeTEF
+  implicit val zonedDateTimeTEF = PrimitiveTypeSupport.zonedDateTimeTEF
+  implicit val optionZonedDateTimeTEF = PrimitiveTypeSupport.optionZonedDateTimeTEF
   implicit val doubleArrayTEF = PrimitiveTypeSupport.doubleArrayTEF
   implicit val intArrayTEF = PrimitiveTypeSupport.intArrayTEF
   implicit val longArrayTEF = PrimitiveTypeSupport.longArrayTEF
@@ -267,6 +269,24 @@ trait PrimitiveTypeMode extends QueryDsl with FieldMapper {
     new QueryValueExpressionNode[OffsetDateTime, TOffsetDateTime](q.copy(false, Nil).ast, offsetDateTimeTEF.createOutMapper)
   implicit def queryOptionOffsetDateTimeMeasuredToTE(q: Query[Measures[Option[OffsetDateTime]]]) =
     new QueryValueExpressionNode[Option[OffsetDateTime], TOptionOffsetDateTime](q.copy(false, Nil).ast, optionOffsetDateTimeTEF.createOutMapper)
+
+  implicit def queryZonedDateTimeToTE(q: Query[ZonedDateTime]) =
+    new QueryValueExpressionNode[ZonedDateTime, TZonedDateTime](q.copy(false, Nil).ast, zonedDateTimeTEF.createOutMapper)
+
+  implicit def queryOptionZonedDateTimeToTE(q: Query[Option[ZonedDateTime]]) =
+    new QueryValueExpressionNode[Option[ZonedDateTime], TOptionZonedDateTime](q.copy(false, Nil).ast, optionZonedDateTimeTEF.createOutMapper)
+
+  implicit def queryZonedDateTimeGroupedToTE(q: Query[Group[ZonedDateTime]]) =
+    new QueryValueExpressionNode[ZonedDateTime, TZonedDateTime](q.copy(false, Nil).ast, zonedDateTimeTEF.createOutMapper)
+
+  implicit def queryOptionZonedDateTimeGroupedToTE(q: Query[Group[Option[ZonedDateTime]]]) =
+    new QueryValueExpressionNode[Option[ZonedDateTime], TOptionZonedDateTime](q.copy(false, Nil).ast, optionZonedDateTimeTEF.createOutMapper)
+
+  implicit def queryZonedDateTimeMeasuredToTE(q: Query[Measures[ZonedDateTime]]) =
+    new QueryValueExpressionNode[ZonedDateTime, TZonedDateTime](q.copy(false, Nil).ast, zonedDateTimeTEF.createOutMapper)
+
+  implicit def queryOptionZonedDateTimeMeasuredToTE(q: Query[Measures[Option[ZonedDateTime]]]) =
+    new QueryValueExpressionNode[Option[ZonedDateTime], TOptionZonedDateTime](q.copy(false, Nil).ast, optionZonedDateTimeTEF.createOutMapper)
 
   implicit def queryBooleanToTE(q: Query[Boolean]) =
     new QueryValueExpressionNode[Boolean, TBoolean](q.copy(false, Nil).ast, PrimitiveTypeSupport.booleanTEF.createOutMapper)
