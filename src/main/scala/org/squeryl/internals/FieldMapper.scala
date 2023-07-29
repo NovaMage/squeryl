@@ -1,18 +1,18 @@
 /** *****************************************************************************
-  * Copyright 2010 Maxime Lévesque
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  * **************************************************************************** */
+ * Copyright 2010 Maxime Lévesque
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * **************************************************************************** */
 
 package org.squeryl.internals
 
@@ -33,9 +33,9 @@ trait FieldMapper {
   implicit def thisFieldMapper = this
 
   /**
-    * Extending classes will expose members of PrimitiveTypeSupport as implicit, to enable
-    * support of primitive types, or will expose theit own non jdbc native types.
-    */
+   * Extending classes will expose members of PrimitiveTypeSupport as implicit, to enable
+   * support of primitive types, or will expose theit own non jdbc native types.
+   */
 
   protected object PrimitiveTypeSupport {
     // =========================== Non Numerical =========================== 
@@ -116,13 +116,6 @@ trait FieldMapper {
       def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[OffsetTime])
     }
 
-    val instantTEF = new TypedExpressionFactory[Instant, TInstant] with PrimitiveJdbcMapper[Instant] {
-      val sample = Instant.now()
-      val defaultColumnLength = -1
-
-      def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[Instant])
-    }
-
     val offsetDateTimeTEF = new TypedExpressionFactory[OffsetDateTime, TOffsetDateTime] with PrimitiveJdbcMapper[OffsetDateTime] {
       val sample = OffsetDateTime.now()
       val defaultColumnLength = -1
@@ -130,12 +123,18 @@ trait FieldMapper {
       def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[OffsetDateTime])
     }
 
-    val zonedDateTimeTEF = new TypedExpressionFactory[ZonedDateTime, TZonedDateTime] with PrimitiveJdbcMapper[ZonedDateTime] {
-      val sample = ZonedDateTime.now()
-      val defaultColumnLength = -1
+    val instantTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, Instant, TInstant](offsetDateTimeTEF, thisFieldMapper) {
+      override def convertFromJdbc(v: OffsetDateTime): Instant = v.toInstant
 
-      def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[ZonedDateTime])
+      override def convertToJdbc(v: Instant): OffsetDateTime = v.atOffset(ZoneOffset.UTC)
     }
+
+    val zonedDateTimeTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, ZonedDateTime, TZonedDateTime](offsetDateTimeTEF, thisFieldMapper) {
+      override def convertFromJdbc(v: OffsetDateTime): ZonedDateTime = v.toZonedDateTime
+
+      override def convertToJdbc(v: ZonedDateTime): OffsetDateTime = v.toOffsetDateTime
+    }
+
 
     val optionTimestampTEF = new TypedExpressionFactory[Option[Timestamp], TOptionTimestamp] with DeOptionizer[Timestamp, Timestamp, TTimestamp, Option[Timestamp], TOptionTimestamp] {
       val deOptionizer = timestampTEF
@@ -149,15 +148,16 @@ trait FieldMapper {
       val deOptionizer = offsetTimeTEF
     }
 
-    val optionInstantTEF = new TypedExpressionFactory[Option[Instant], TOptionInstant] with DeOptionizer[Instant, Instant, TInstant, Option[Instant], TOptionInstant] {
-      val deOptionizer = instantTEF
-    }
 
     val optionOffsetDateTimeTEF = new TypedExpressionFactory[Option[OffsetDateTime], TOptionOffsetDateTime] with DeOptionizer[OffsetDateTime, OffsetDateTime, TOffsetDateTime, Option[OffsetDateTime], TOptionOffsetDateTime] {
       val deOptionizer = offsetDateTimeTEF
     }
 
-    val optionZonedDateTimeTEF = new TypedExpressionFactory[Option[ZonedDateTime], TOptionZonedDateTime] with DeOptionizer[ZonedDateTime, ZonedDateTime, TZonedDateTime, Option[ZonedDateTime], TOptionZonedDateTime] {
+    val optionInstantTEF = new TypedExpressionFactory[Option[Instant], TOptionInstant] with DeOptionizer[OffsetDateTime, Instant, TInstant, Option[Instant], TOptionInstant] {
+      val deOptionizer = instantTEF
+    }
+
+    val optionZonedDateTimeTEF = new TypedExpressionFactory[Option[ZonedDateTime], TOptionZonedDateTime] with DeOptionizer[OffsetDateTime, ZonedDateTime, TZonedDateTime, Option[ZonedDateTime], TOptionZonedDateTime] {
       val deOptionizer = zonedDateTimeTEF
     }
 
@@ -385,12 +385,12 @@ trait FieldMapper {
     val re = enumValueTEF(DummyEnum.DummyEnumerationValue)
 
     /**
-      * Enumerations are treated differently, since the map method should normally
-      * return the actual Enumeration#value, but given that an enum is not only
-      * determined by the int value from the DB, but also the parent Enumeration
-      * parentEnumeration.values.find(_.id == v), the conversion is done
-      * in FieldMetaData.canonicalEnumerationValueFor(i: Int)
-      */
+     * Enumerations are treated differently, since the map method should normally
+     * return the actual Enumeration#value, but given that an enum is not only
+     * determined by the int value from the DB, but also the parent Enumeration
+     * parentEnumeration.values.find(_.id == v), the conversion is done
+     * in FieldMetaData.canonicalEnumerationValueFor(i: Int)
+     */
     val z = new FieldAttributesBasedOnType[Any](
       new {
         def map(rs: ResultSet, i: Int) = rs.getInt(i)
