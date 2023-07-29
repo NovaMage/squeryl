@@ -370,8 +370,6 @@ trait FieldMapper {
     register(localDateTimeTEF)
     register(offsetTimeTEF)
     register(offsetDateTimeTEF)
-    register(instantTEF)
-    register(zonedDateTimeTEF)
     register(dateTEF)
     register(sqlDateTEF)
     register(localDateTEF)
