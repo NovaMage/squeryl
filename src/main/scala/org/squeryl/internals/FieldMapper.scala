@@ -123,13 +123,13 @@ trait FieldMapper {
       def extractNativeJdbcValue(rs: ResultSet, i: Int) = rs.getObject(i, classOf[OffsetDateTime])
     }
 
-    val instantTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, Instant, TInstant](offsetDateTimeTEF, thisFieldMapper) {
+    val instantTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, Instant, TOffsetDateTime](offsetDateTimeTEF, thisFieldMapper) {
       override def convertFromJdbc(v: OffsetDateTime): Instant = v.toInstant
 
       override def convertToJdbc(v: Instant): OffsetDateTime = v.atOffset(ZoneOffset.UTC)
     }
 
-    val zonedDateTimeTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, ZonedDateTime, TZonedDateTime](offsetDateTimeTEF, thisFieldMapper) {
+    val zonedDateTimeTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, ZonedDateTime, TOffsetDateTime](offsetDateTimeTEF, thisFieldMapper) {
       override def convertFromJdbc(v: OffsetDateTime): ZonedDateTime = v.toZonedDateTime
 
       override def convertToJdbc(v: ZonedDateTime): OffsetDateTime = v.toOffsetDateTime
@@ -153,11 +153,11 @@ trait FieldMapper {
       val deOptionizer = offsetDateTimeTEF
     }
 
-    val optionInstantTEF = new TypedExpressionFactory[Option[Instant], TOptionInstant] with DeOptionizer[OffsetDateTime, Instant, TInstant, Option[Instant], TOptionInstant] {
+    val optionInstantTEF = new TypedExpressionFactory[Option[Instant], TOptionOffsetDateTime] with DeOptionizer[OffsetDateTime, Instant, TOffsetDateTime, Option[Instant], TOptionOffsetDateTime] {
       val deOptionizer = instantTEF
     }
 
-    val optionZonedDateTimeTEF = new TypedExpressionFactory[Option[ZonedDateTime], TOptionZonedDateTime] with DeOptionizer[OffsetDateTime, ZonedDateTime, TZonedDateTime, Option[ZonedDateTime], TOptionZonedDateTime] {
+    val optionZonedDateTimeTEF = new TypedExpressionFactory[Option[ZonedDateTime], TOptionOffsetDateTime] with DeOptionizer[OffsetDateTime, ZonedDateTime, TOffsetDateTime, Option[ZonedDateTime], TOptionOffsetDateTime] {
       val deOptionizer = zonedDateTimeTEF
     }
 

@@ -46,8 +46,7 @@ sealed trait TByte extends TOptionByte with TInt with TNonOption
 sealed trait TOption
  extends TOptionByte with TOptionInt with TOptionFloat with TOptionLong with TOptionDouble with TOptionBigDecimal
    with TOptionDate with TOptionLocalDate with TOptionLocalTime with TOptionString
-   with TOptionTimestamp with TOptionLocalDateTime with TOptionOffsetTime with TOptionInstant with TOptionOffsetDateTime
-   with TOptionZonedDateTime
+   with TOptionTimestamp with TOptionLocalDateTime with TOptionOffsetTime with TOptionOffsetDateTime
 
 sealed trait TNumericLowerTypeBound
   extends TByte with TInt with TFloat with TLong with TDouble with TBigDecimal
@@ -57,7 +56,7 @@ sealed trait TNonOption
 sealed trait TOptionLowerBound
  extends TOptionByte with TOptionInt with TOptionFloat with TOptionLong with TOptionDouble with TOptionBigDecimal
  with TOptionDate with TOptionString with TOptionTimestamp with TOptionLocalDate with TOptionLocalTime
- with TOptionLocalDateTime with TOptionOffsetTime with TOptionInstant with TOptionOffsetDateTime with TOptionZonedDateTime
+ with TOptionLocalDateTime with TOptionOffsetTime with TOptionOffsetDateTime
 
 sealed trait TEnumValue[A]
 sealed trait TOptionEnumValue[A] extends TEnumValue[A]
@@ -69,9 +68,7 @@ sealed trait TLocalTime extends TOptionLocalTime with TNonOption
 sealed trait TTimestamp extends TOptionTimestamp with TNonOption
 sealed trait TLocalDateTime extends TOptionLocalDateTime with TNonOption
 sealed trait TOffsetTime extends TOptionOffsetTime with TNonOption
-sealed trait TInstant extends TOptionInstant with TNonOption
 sealed trait TOffsetDateTime extends TOptionOffsetDateTime with TNonOption
-sealed trait TZonedDateTime extends TOptionZonedDateTime with TNonOption
 sealed trait TByteArray extends TOptionByteArray  with TNonOption
 sealed trait TIntArray extends TOptionIntArray  with TNonOption
 sealed trait TLongArray extends TOptionLongArray  with TNonOption
@@ -84,9 +81,7 @@ sealed trait TOptionLocalTime
 sealed trait TOptionTimestamp
 sealed trait TOptionLocalDateTime
 sealed trait TOptionOffsetTime
-sealed trait TOptionInstant
 sealed trait TOptionOffsetDateTime
-sealed trait TOptionZonedDateTime
 sealed trait TOptionByteArray
 sealed trait TOptionIntArray
 sealed trait TOptionLongArray
