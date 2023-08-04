@@ -129,12 +129,6 @@ trait FieldMapper {
       override def convertToJdbc(v: Instant): OffsetDateTime = v.atOffset(ZoneOffset.UTC)
     }
 
-    val zonedDateTimeTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, ZonedDateTime, TZonedDateTime](offsetDateTimeTEF, thisFieldMapper) {
-      override def convertFromJdbc(v: OffsetDateTime): ZonedDateTime = v.toZonedDateTime
-
-      override def convertToJdbc(v: ZonedDateTime): OffsetDateTime = v.toOffsetDateTime
-    }
-
 
     val optionTimestampTEF = new TypedExpressionFactory[Option[Timestamp], TOptionTimestamp] with DeOptionizer[Timestamp, Timestamp, TTimestamp, Option[Timestamp], TOptionTimestamp] {
       val deOptionizer = timestampTEF
@@ -155,10 +149,6 @@ trait FieldMapper {
 
     val optionInstantTEF = new TypedExpressionFactory[Option[Instant], TOptionInstant] with DeOptionizer[OffsetDateTime, Instant, TInstant, Option[Instant], TOptionInstant] {
       val deOptionizer = instantTEF
-    }
-
-    val optionZonedDateTimeTEF = new TypedExpressionFactory[Option[ZonedDateTime], TOptionZonedDateTime] with DeOptionizer[OffsetDateTime, ZonedDateTime, TZonedDateTime, Option[ZonedDateTime], TOptionZonedDateTime] {
-      val deOptionizer = zonedDateTimeTEF
     }
 
     val booleanTEF = new TypedExpressionFactory[Boolean, TBoolean] with PrimitiveJdbcMapper[Boolean] {
