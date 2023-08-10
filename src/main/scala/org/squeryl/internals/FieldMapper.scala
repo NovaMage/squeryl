@@ -124,9 +124,9 @@ trait FieldMapper {
     }
 
     val instantTEF = new NonPrimitiveJdbcMapper[OffsetDateTime, Instant, TInstant](offsetDateTimeTEF, thisFieldMapper) {
-      override def convertFromJdbc(v: OffsetDateTime): Instant = v.toInstant
+      override def convertFromJdbc(v: OffsetDateTime): Instant = if (v == null) null else v.toInstant
 
-      override def convertToJdbc(v: Instant): OffsetDateTime = v.atOffset(ZoneOffset.UTC)
+      override def convertToJdbc(v: Instant): OffsetDateTime = if (v == null) null else v.atOffset(ZoneOffset.UTC)
     }
 
 
