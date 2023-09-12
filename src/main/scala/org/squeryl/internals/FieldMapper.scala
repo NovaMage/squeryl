@@ -474,7 +474,7 @@ trait FieldMapper {
       Utils.throwError("field type " + z.clasz + " already registered, handled by " + m.getClass.getCanonicalName)
   }
 
-  private[squeryl] def register[S, J](m: ArrayJdbcMapper[S, J]): Unit = {
+  def register[S, J](m: ArrayJdbcMapper[S, J]): Unit = {
     val f = m.thisTypedExpressionFactory
     val z = new FieldAttributesBasedOnType(
       makeMapper(m),
