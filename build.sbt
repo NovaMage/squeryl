@@ -39,7 +39,6 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
   "-feature",
-  "-quickfix",
   "-language:implicitConversions",
   "-language:postfixOps",
   "-language:reflectiveCalls",
