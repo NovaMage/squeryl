@@ -1,9 +1,10 @@
 package org.squeryl.framework
 
-import org.squeryl.{SessionFactory, Schema}
-
+import org.squeryl.{Schema, SessionFactory}
 import org.squeryl.test.PrimitiveTypeModeForTests._
 import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 abstract class SchemaTester extends DbTestBase {
   self: DBConnector =>
@@ -42,7 +43,7 @@ abstract class SchemaTester extends DbTestBase {
   }
 }
 
-abstract class DbTestBase extends FunSuite with BeforeAndAfterAll with BeforeAndAfterEach with Matchers {
+abstract class DbTestBase extends AnyFunSuite with BeforeAndAfterAll with BeforeAndAfterEach with Matchers {
   self: DBConnector =>
 
   def isIgnored(testName: String) =

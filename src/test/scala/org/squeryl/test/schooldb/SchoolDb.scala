@@ -505,7 +505,7 @@ abstract class SchoolDbTestRun extends SchoolDbTestBase {
       compute(avg(s.age))
     )
 
-  def avgStudentAgeFunky() =
+  def avgStudentAgeFunky(): Query[Measures[Product4[Option[Float], Option[Float], Option[Double], Long]]] =
     from(students)(s =>
       compute(avg(s.age), avg(s.age) + 3, avg(s.age) / count, count + 6)
     )
@@ -774,7 +774,7 @@ abstract class SchoolDbTestRun extends SchoolDbTestBase {
   }
 
   test("OptionAndNonOptionMixInComputeTuple"){
-    val _:Product4[Option[Float],Option[Float],Option[Double], Long] = avgStudentAgeFunky
+    val a: Query[Measures[Product4[Option[Float], Option[Float], Option[Double], Long]]] = avgStudentAgeFunky()
   }
 
   test("testServerSideFunctionCall") {

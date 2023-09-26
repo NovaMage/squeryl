@@ -27,7 +27,7 @@ parallelExecution := false
 
 publishMavenStyle := true
 
-scalaVersion := "2.12.18"
+scalaVersion := "2.13.12"
 
 scalacOptions in(Compile, doc) ++= {
   val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
@@ -38,8 +38,8 @@ scalacOptions in(Compile, doc) ++= {
 scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
-  "-Xfuture",
   "-feature",
+  "-quickfix",
   "-language:implicitConversions",
   "-language:postfixOps",
   "-language:reflectiveCalls",
@@ -95,10 +95,11 @@ libraryDependencies ++= Seq(
   "net.sourceforge.jtds" % "jtds" % "1.3.1" % "provided",
   "org.apache.derby" % "derby" % "10.11.1.1" % "provided",
   "org.xerial" % "sqlite-jdbc" % "3.25.2" % "test",
-  "org.json4s" %% "json4s-scalap" % "3.6.3",
-  "org.scala-lang.modules" %% "scala-xml" % "1.1.0"
+  "org.json4s" %% "json4s-scalap" % "3.6.12",
+  "org.scala-lang.modules" %% "scala-xml" % "1.3.1"
 )
 
-libraryDependencies ++= {
-  Seq("org.scalatest" %% "scalatest" % "3.0.6-SNAP5" % "test")
-}
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest-funsuite" % "3.2.17" % "test",
+  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.17" % "test",
+)

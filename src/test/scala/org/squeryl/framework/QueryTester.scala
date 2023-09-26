@@ -1,8 +1,8 @@
 package org.squeryl.framework
 
-import org.squeryl.{Session, Query}
+import org.scalatest.matchers.should.Matchers
+import org.squeryl.{Query, Session}
 import org.squeryl.test.PrimitiveTypeModeForTests._
-import org.scalatest.Matchers
 
 trait QueryTester extends Matchers {
 

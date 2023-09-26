@@ -18,15 +18,14 @@ package org.squeryl.test.musicdb
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.temporal.{ChronoUnit, TemporalUnit}
-
 import org.squeryl._
 import adapters._
 import dsl._
 import framework._
-import java.util.Calendar
+import org.scalatest.matchers.should.Matchers
 
+import java.util.Calendar
 import org.squeryl.test.PrimitiveTypeModeForTests._
-import org.scalatest.Matchers
 
 object Genre extends Enumeration {
   type Genre = Value
@@ -558,7 +557,7 @@ abstract class MusicDbTestRun extends SchemaTester with QueryTester with RunTest
   }
 
   test("TestTimestampImplicit"){
-    val _: Option[LocalDateTime] =
+    val b: Query[Measures[Option[LocalDateTime]]] =
       from(artists)(a=>
         compute(min(a.timeOfLastUpdate))
       )
