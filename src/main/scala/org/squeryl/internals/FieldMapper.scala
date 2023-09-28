@@ -23,6 +23,7 @@ import org.squeryl.TargetsValuesSupertype
 import org.squeryl.dsl.{ArrayJdbcMapper, _}
 
 import java.sql
+import scala.annotation.tailrec
 import scala.collection.mutable.HashMap
 
 trait FieldMapper {
@@ -492,9 +493,8 @@ trait FieldMapper {
      * in FieldMetaData.canonicalEnumerationValueFor(i: Int)
      */
     val z = new FieldAttributesBasedOnType[Any](
-      new {
-        def map(rs: ResultSet, i: Int): Int = rs.getInt(i)
-
+      new MapperForReflection {
+        def map(rs: ResultSet, i: Int): Any = rs.getInt(i)
         def convertToJdbc(v: AnyRef): AnyRef = v
       },
       re.defaultColumnLength,
