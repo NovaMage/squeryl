@@ -992,7 +992,6 @@ trait DatabaseAdapter {
       case "java.lang.Byte[]" => Types.BINARY
       case "java.time.LocalDate" => Types.DATE
       case "java.time.LocalTime" => Types.TIME
-      case "java.time.LocalDateTime" => Types.TIMESTAMP
       case "java.time.OffsetDateTime" => Types.TIMESTAMP_WITH_TIMEZONE
       case "byte[]" => Types.BINARY
       case "java.sql.Date" => Types.DATE
