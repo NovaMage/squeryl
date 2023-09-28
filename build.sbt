@@ -34,7 +34,7 @@ val commonSettings = Def.settings(
   ),
   parallelExecution := false,
   publishMavenStyle := true,
-  crossScalaVersions := Seq("2.12.18", Scala211, "2.10.7", "2.13.12", "3.3.1"),
+  crossScalaVersions := Seq("2.12.18", Scala211, "2.10.7", "2.13.12"),
   Compile / doc / scalacOptions ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     val hash = sys.process.Process("git rev-parse HEAD").lineStream_!.head
@@ -132,11 +132,11 @@ libraryDependencies ++= {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((scalaMajor, scalaMinor)) if scalaMajor == 3 =>
       Seq(
-        "org.scala-lang.modules" %% "scala-xml" % "2.2.0",
+        "org.scala-lang.modules" %% "scala-xml" % "1.3.1"
       )
     case Some((scalaMajor, scalaMinor)) if scalaMajor == 2 && scalaMinor >= 12 =>
       Seq(
-        "org.scala-lang.modules" %% "scala-xml" % "2.2.0",
+        "org.scala-lang.modules" %% "scala-xml" % "1.3.1",
         scalap
       )
     case Some((scalaMajor, scalaMinor)) if scalaMajor == 2 && scalaMinor >= 11 =>
@@ -151,38 +151,38 @@ libraryDependencies ++= {
   }
 }
 
-val disableMacrosProject: Def.Initialize[Boolean] = Def.setting(
-  scalaBinaryVersion.value != "3"
-)
+//val disableMacrosProject: Def.Initialize[Boolean] = Def.setting(
+//  scalaBinaryVersion.value != "3"
+//)
 
-pomPostProcess := { node =>
-  import scala.xml._
-  import scala.xml.transform._
-  val rule = new RewriteRule {
-    override def transform(node: Node) = {
-      if (
-        (node.label == "dependency") &&
-        ((node \ "groupId").text == "org.squeryl") &&
-        (node \ "artifactId").text.startsWith((macros / moduleName).value) &&
-        disableMacrosProject.value
-      ) {
-        NodeSeq.Empty
-      } else {
-        node
-      }
-    }
-  }
-  new RuleTransformer(rule).transform(node)(0)
-}
-
-lazy val macros = project
-  .in(file("macros"))
-  .settings(
-    commonSettings,
-    publish / skip := disableMacrosProject.value,
-  )
-
-dependsOn(macros)
+//pomPostProcess := { node =>
+//  import scala.xml._
+//  import scala.xml.transform._
+//  val rule = new RewriteRule {
+//    override def transform(node: Node) = {
+//      if (
+//        (node.label == "dependency") &&
+//        ((node \ "groupId").text == "org.squeryl") &&
+//        (node \ "artifactId").text.startsWith((macros / moduleName).value) &&
+//        disableMacrosProject.value
+//      ) {
+//        NodeSeq.Empty
+//      } else {
+//        node
+//      }
+//    }
+//  }
+//  new RuleTransformer(rule).transform(node)(0)
+//}
+//
+//lazy val macros = project
+//  .in(file("macros"))
+//  .settings(
+//    commonSettings,
+//    publish / skip := disableMacrosProject.value,
+//  )
+//
+//dependsOn(macros)
 
 ThisBuild / semanticdbEnabled := {
   scalaBinaryVersion.value != "2.10"

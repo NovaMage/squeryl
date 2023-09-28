@@ -188,23 +188,23 @@ trait QueryDsl
 
   def notExists[A1](query: Query[A1]) = new ExistsExpression(query.copy(false, Nil).ast, "not exists")
 
-  implicit val numericComparisonEvidence = new CanCompare[TNumeric, TNumeric]
-  implicit val dateComparisonEvidence = new CanCompare[TOptionDate, TOptionDate]
-  implicit val localDateComparisonEvidence = new CanCompare[TOptionLocalDate, TOptionLocalDate]
-  implicit val localTimeComparisonEvidence = new CanCompare[TOptionLocalTime, TOptionLocalTime]
-  implicit val timestampComparisonEvidence = new CanCompare[TOptionTimestamp, TOptionTimestamp]
-  implicit val localDateTimeComparisonEvidence = new CanCompare[TOptionLocalDateTime, TOptionLocalDateTime]
-  implicit val instantComparisonEvidence = new CanCompare[TOptionInstant, TOptionInstant]
-  implicit val instantToOffsetDateTimeComparisonEvidence = new CanCompare[TOptionInstant, TOptionOffsetDateTime]
-  implicit val offsetDateTimeComparisonEvidence = new CanCompare[TOptionOffsetDateTime, TOptionOffsetDateTime]
-  implicit val offsetDateTimeToInstantComparisonEvidence = new CanCompare[TOptionOffsetDateTime, TOptionInstant]
-  implicit val offsetTimeComparisonEvidence = new CanCompare[TOptionOffsetTime, TOptionOffsetTime]
-  implicit val stringComparisonEvidence = new CanCompare[TOptionString, TOptionString]
-  implicit val booleanComparisonEvidence = new CanCompare[TOptionBoolean, TOptionBoolean]
+  implicit val numericComparisonEvidence: CanCompare[TNumeric, TNumeric] = new CanCompare[TNumeric, TNumeric]
+  implicit val dateComparisonEvidence: CanCompare[TOptionDate, TOptionDate] = new CanCompare[TOptionDate, TOptionDate]
+  implicit val localDateComparisonEvidence: CanCompare[TOptionLocalDate, TOptionLocalDate] = new CanCompare[TOptionLocalDate, TOptionLocalDate]
+  implicit val localTimeComparisonEvidence: CanCompare[TOptionLocalTime, TOptionLocalTime] = new CanCompare[TOptionLocalTime, TOptionLocalTime]
+  implicit val timestampComparisonEvidence: CanCompare[TOptionTimestamp, TOptionTimestamp] = new CanCompare[TOptionTimestamp, TOptionTimestamp]
+  implicit val localDateTimeComparisonEvidence: CanCompare[TOptionLocalDateTime, TOptionLocalDateTime] = new CanCompare[TOptionLocalDateTime, TOptionLocalDateTime]
+  implicit val instantComparisonEvidence: CanCompare[TOptionInstant, TOptionInstant] = new CanCompare[TOptionInstant, TOptionInstant]
+  implicit val instantToOffsetDateTimeComparisonEvidence: CanCompare[TOptionInstant, TOptionOffsetDateTime] = new CanCompare[TOptionInstant, TOptionOffsetDateTime]
+  implicit val offsetDateTimeComparisonEvidence: CanCompare[TOptionOffsetDateTime, TOptionOffsetDateTime] = new CanCompare[TOptionOffsetDateTime, TOptionOffsetDateTime]
+  implicit val offsetDateTimeToInstantComparisonEvidence: CanCompare[TOptionOffsetDateTime, TOptionInstant] = new CanCompare[TOptionOffsetDateTime, TOptionInstant]
+  implicit val offsetTimeComparisonEvidence: CanCompare[TOptionOffsetTime, TOptionOffsetTime] = new CanCompare[TOptionOffsetTime, TOptionOffsetTime]
+  implicit val stringComparisonEvidence: CanCompare[TOptionString, TOptionString] = new CanCompare[TOptionString, TOptionString]
+  implicit val booleanComparisonEvidence: CanCompare[TOptionBoolean, TOptionBoolean] = new CanCompare[TOptionBoolean, TOptionBoolean]
   implicit val uuidComparisonEvidence: CanCompare[TOptionUUID, TOptionUUID] = new CanCompare[TOptionUUID, TOptionUUID]
   implicit val intArrayComparisonEvidence: CanCompare[TIntArray, TIntArray] = new CanCompare[TIntArray, TIntArray]
   implicit val longArrayComparisonEvidence: CanCompare[TLongArray, TLongArray] = new CanCompare[TLongArray, TLongArray]
-  implicit def enumComparisonEvidence[A] = new CanCompare[TEnumValue[A], TEnumValue[A]]
+  implicit def enumComparisonEvidence[A]: CanCompare[TEnumValue[A], TEnumValue[A]] = new CanCompare[TEnumValue[A], TEnumValue[A]]
 
   implicit def concatenationConversion[A1, A2, T1, T2](co: ConcatOp[A1, A2, T1, T2]): TypedExpression[String, TString] =
     new ConcatOperationNode[String, TString](co.a1, co.a2, InternalFieldMapper.stringTEF.createOutMapper)
