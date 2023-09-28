@@ -1,5 +1,4 @@
-[![maven central](https://maven-badges.herokuapp.com/maven-central/org.squeryl/squeryl_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.squeryl/squeryl_2.12)
-[![javadoc](https://javadoc.io/badge2/org.squeryl/squeryl_2.13/javadoc.svg)](https://javadoc.io/doc/org.squeryl/squeryl_2.13)
+[![maven central](https://maven-badges.herokuapp.com/maven-central/com.github.novamage/squeryl_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.novamage/squeryl_2.12)
 
 ## How to build
 1. Download or clone repository:  
