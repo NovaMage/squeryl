@@ -4,6 +4,10 @@ name := "squeryl"
 
 description := "A Scala ORM and DSL for talking with Databases using minimum verbosity and maximum type safety"
 
+releaseUseGlobalVersion := false
+
+ThisBuild / versionScheme := Some("semver-spec")
+
 val commonSettings = Def.settings(
   organization := "com.github.novamage",
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
