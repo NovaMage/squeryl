@@ -506,19 +506,13 @@ trait FieldMapper {
     registry.put(z.clasz.getSuperclass, z)
   }
 
-  protected type MapperForReflection = {
+  protected trait MapperForReflection {
     def map(rs: ResultSet, i: Int): Any
     def convertToJdbc(v: AnyRef): AnyRef
   }
 
-  protected def makeMapper(fa0: JdbcMapper[_, _]): Object {
-    val fa: JdbcMapper[AnyRef, AnyRef]
-
-    def map(rs: ResultSet, i: Int): AnyRef
-
-    def convertToJdbc(v: AnyRef): AnyRef
-  } = new {
-    val fa: JdbcMapper[AnyRef, AnyRef] = fa0.asInstanceOf[JdbcMapper[AnyRef, AnyRef]]
+  protected def makeMapper(fa0: JdbcMapper[_, _]) = new MapperForReflection {
+    val fa = fa0.asInstanceOf[JdbcMapper[AnyRef, AnyRef]]
 
     def map(rs: ResultSet, i: Int): AnyRef = fa.map(rs, i)
 
@@ -549,7 +543,7 @@ trait FieldMapper {
     get(nonNativeType).mapper.convertToJdbc(r)
 
   def isSupported(c: Class[_]): Boolean =
-    lookup(c) != None ||
+    lookup(c).isDefined ||
       c.isAssignableFrom(classOf[Some[_]]) ||
       classOf[Product1[Any]].isAssignableFrom(c)
 
@@ -593,7 +587,7 @@ trait FieldMapper {
 
     val wasThere = registry.put(z.clasz, z)
 
-    if (wasThere != None)
+    if (wasThere.isDefined)
       Utils.throwError("field type " + z.clasz + " already registered, handled by " + m.getClass.getCanonicalName)
   }
 
@@ -603,7 +597,7 @@ trait FieldMapper {
 
     val wasThere = registry.put(z.clasz, z)
 
-    if (wasThere != None)
+    if (wasThere.isDefined)
       Utils.throwError("field type " + z.clasz + " already registered, handled by " + m.getClass.getCanonicalName)
   }
 
@@ -616,6 +610,7 @@ trait FieldMapper {
     registry.put(c, z)
   }
 
+  @tailrec
   private def lookup(c: Class[_]): Option[FieldAttributesBasedOnType[_]] = {
     if (!c.isPrimitive)
       registry.get(c)
