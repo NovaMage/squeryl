@@ -6,7 +6,9 @@ import org.squeryl.dsl.{ArrayJdbcMapper, TypedExpressionFactory}
 import java.sql
 import java.sql.ResultSet
 
-abstract class ArrayTEF[P, TE] extends TypedExpressionFactory[Array[P], TE] with ArrayJdbcMapper[java.sql.Array, Array[P]] {
+abstract class ArrayTEF[P, TE]
+    extends TypedExpressionFactory[Array[P], TE]
+    with ArrayJdbcMapper[java.sql.Array, Array[P]] {
   // must define "sample" that includes an element. e.g. Array[Int](0)
   def sample: Array[P]
 

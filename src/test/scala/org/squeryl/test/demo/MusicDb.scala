@@ -40,7 +40,14 @@ case class Artist(name: String) extends MusicDbObject {
 
 // Option[] members are mapped to nullable database columns,
 // otherwise they have a NOT NULL constraint.
-class Song(val title: String, val artistId: Long, val filePath: Option[String], val year: Int, val instant: Instant, val optionalInstant: Option[Instant]) extends MusicDbObject {
+class Song(
+  val title: String,
+  val artistId: Long,
+  val filePath: Option[String],
+  val year: Int,
+  val instant: Instant,
+  val optionalInstant: Option[Instant]
+) extends MusicDbObject {
 
   // IMPORTANT : currently classes with Option[] members *must* provide a zero arg
   // constructor where every Option[T] member gets initialized with Some(t:T).
@@ -106,14 +113,11 @@ class Playlist(val name: String, val path: String) extends MusicDbObject {
         s.optionalInstant := Some(zonedNow)
       )
     )
-    update(songs)(s =>
-      setAll(s.optionalInstant := None
-      )
-    )
+    update(songs)(s => setAll(s.optionalInstant := None))
     from(artists, songs)((a, s) =>
       where(a.id === s.artistId and s.optionalInstant.gte(zonedNow))
-        groupBy (a.id)
-        compute(count, max(s.optionalInstant))
+      groupBy(a.id)
+      compute(count, max(s.optionalInstant))
     )
 
   }

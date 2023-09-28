@@ -5,6 +5,4 @@ package org.squeryl
   * of any values of marked type instead of the type directly.  Useful for mapping jdbc into objects as their sample
   * types are unique and usually the field type is the supertype instead.
   */
-trait TargetsValuesSupertype {
-
-}
+trait TargetsValuesSupertype {}

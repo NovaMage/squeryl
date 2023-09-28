@@ -214,11 +214,13 @@ class FieldMetaData(
 
   val resultSetHandler = createResultSetHandler
 
-  if(!isCustomType)
-    assert(fieldType == wrappedFieldType ||
-      classOf[TargetsValuesSupertype].isAssignableFrom(fieldType) && fieldType.getSuperclass == wrappedFieldType,
-      "expected fieldType == wrappedFieldType in primitive type mode, got "+
-      fieldType.getName + " != " + wrappedFieldType.getName)
+  if (!isCustomType)
+    assert(
+      fieldType == wrappedFieldType ||
+        classOf[TargetsValuesSupertype].isAssignableFrom(fieldType) && fieldType.getSuperclass == wrappedFieldType,
+      "expected fieldType == wrappedFieldType in primitive type mode, got " +
+        fieldType.getName + " != " + wrappedFieldType.getName
+    )
 
   override def toString =
     parentMetaData.clasz.getSimpleName + "." + columnName + ":" + displayType
@@ -479,7 +481,7 @@ object FieldMetaData {
       val isOption = v.isInstanceOf[Some[_]]
 
       val typeOfFieldOrTypeOfOption = v match {
-        case Some(sc:TargetsValuesSupertype) =>
+        case Some(sc: TargetsValuesSupertype) =>
           sc.getClass.getSuperclass
         case Some(x) =>
           x.getClass

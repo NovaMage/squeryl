@@ -902,17 +902,17 @@ trait DatabaseAdapter {
         stringTypeDeclaration
       else if (ar.isInstanceOf[java.sql.Timestamp])
         timestampTypeDeclaration
-      else if(ar.isInstanceOf[LocalDateTime])
+      else if (ar.isInstanceOf[LocalDateTime])
         localDateTimeTypeDeclaration
-      else if(ar.isInstanceOf[OffsetTime])
+      else if (ar.isInstanceOf[OffsetTime])
         offsetTimeTypeDeclaration
-      else if(ar.isInstanceOf[OffsetDateTime])
+      else if (ar.isInstanceOf[OffsetDateTime])
         offsetDateTimeTypeDeclaration
       else if (ar.isInstanceOf[java.util.Date])
         dateTypeDeclaration
-      else if(ar.isInstanceOf[LocalDate])
+      else if (ar.isInstanceOf[LocalDate])
         localDateTypeDeclaration
-      else if(ar.isInstanceOf[LocalTime])
+      else if (ar.isInstanceOf[LocalTime])
         localTimeTypeDeclaration
       else if (ar.isInstanceOf[java.lang.Integer])
         intTypeDeclaration

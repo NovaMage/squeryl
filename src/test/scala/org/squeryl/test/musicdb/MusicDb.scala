@@ -487,7 +487,7 @@ abstract class MusicDbTestRun extends SchemaTester with QueryTester with RunTest
     expected shouldBe q.toList
   }
 
-  test("Timestamp"){
+  test("Timestamp") {
     val testInstance = sharedTestInstance; import testInstance._
 
     var mongo = artists.where(_.firstName === mongoSantaMaria.firstName).single
@@ -500,18 +500,19 @@ abstract class MusicDbTestRun extends SchemaTester with QueryTester with RunTest
 
     mongo.timeOfLastUpdate = tX2
 
-
     artists.update(mongo)
     mongo = artists.where(_.firstName === mongoSantaMaria.firstName).single
 
     tX2 shouldBe mongo.timeOfLastUpdate
 
     val mustBeSome =
-      artists.where(a =>
-        a.firstName === mongoSantaMaria.firstName and
-        //a.timeOfLastUpdate.between(createLeafNodeOfScalarTimestampType(tX1), createLeafNodeOfScalarTimestampType(tX2))
-        a.timeOfLastUpdate.between(tX1, tX2)
-      ).headOption
+      artists
+        .where(a =>
+          a.firstName === mongoSantaMaria.firstName and
+            // a.timeOfLastUpdate.between(createLeafNodeOfScalarTimestampType(tX1), createLeafNodeOfScalarTimestampType(tX2))
+            a.timeOfLastUpdate.between(tX1, tX2)
+        )
+        .headOption
 
     assert(mustBeSome.isDefined, "testTimestamp failed");
   }
@@ -531,31 +532,27 @@ abstract class MusicDbTestRun extends SchemaTester with QueryTester with RunTest
     out
   }
 
-
-  test("TestTimestampImplicit"){
+  test("TestTimestampImplicit") {
     val b: Option[LocalDateTime] =
-      from(artists)(a=>
-        compute(min(a.timeOfLastUpdate))
-      )
+      from(artists)(a => compute(min(a.timeOfLastUpdate)))
   }
 
-  ignore("TimestampPartialUpdate"){
+  ignore("TimestampPartialUpdate") {
     val testInstance = sharedTestInstance; import testInstance._
 
     var mongo = artists.where(_.firstName === mongoSantaMaria.firstName).single
     // round to 0 second :
     mongo = _truncateTimestampInTimeOfLastUpdate(mongo)
 
-
     val newUpdateTime = LocalDateTime.now().plusDays(12)
 
-    update(artists)(a=>
+    update(artists)(a =>
       where(a.id === mongo.id)
       set(a.timeOfLastUpdate := newUpdateTime)
     )
 
     val res = artists.where(_.firstName === mongoSantaMaria.firstName).single.timeOfLastUpdate
-    //val res = mongo.timeOfLastUpdate
+    // val res = mongo.timeOfLastUpdate
 
     newUpdateTime shouldBe res
   }
