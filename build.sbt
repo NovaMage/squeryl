@@ -86,6 +86,11 @@ val commonSettings = Def.settings(
              </scm>
              <developers>
                <developer>
+                 <id>NovaMage</id>
+                 <name>Ángel Blanco</name>
+                 <url>https://github.com/NovaMage</url>
+               </developer>
+               <developer>
                  <id>max-l</id>
                  <name>Maxime Lévesque</name>
                  <url>https://github.com/max-l</url>
