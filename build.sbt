@@ -109,7 +109,7 @@ val commonSettings = Def.settings(
 
 commonSettings
 
-val Scala211 = "2.11.12"
+val Scala211 = "2.12.18"
 
 lazy val unusedWarnings = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value) match {
