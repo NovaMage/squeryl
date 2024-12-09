@@ -4,6 +4,10 @@ name := "squeryl"
 
 description := "A Scala ORM and DSL for talking with Databases using minimum verbosity and maximum type safety"
 
+releaseUseGlobalVersion := false
+
+ThisBuild / versionScheme := Some("semver-spec")
+
 val commonSettings = Def.settings(
   organization := "org.squeryl",
   javacOptions := {
@@ -93,6 +97,11 @@ val commonSettings = Def.settings(
                <connection>scm:git:git@github.com:squeryl/squeryl.git</connection>
              </scm>
              <developers>
+               <developer>
+                 <id>NovaMage</id>
+                 <name>Ángel Blanco</name>
+                 <url>https://github.com/NovaMage</url>
+               </developer>
                <developer>
                  <id>max-l</id>
                  <name>Maxime Lévesque</name>

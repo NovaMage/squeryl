@@ -1,3 +1,38 @@
+*.class
+*.log
+.jvmopts
+.sbtopts
+
+# Worksheets
+*.sc
+
+# Node
+node_modules/**
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+log/
+
+# Scala-IDE specific
+.scala_dependencies
+
+#Intellij-IDEA specific
+.idea/**
+.bsp/**
+
+#Eclipse
+.classpath
+.project
+.settings/
+.DS_Store
+.cache
+project/project/
+
 !.gitignore
 *~
 pom.xml
@@ -16,6 +51,7 @@ derby.log
 org.squeryl.tests.cfg
 profileOfH2Tests.html
 *.h2.db
+*.orig
 *.trace.db
 .sbtconfig
 tags
