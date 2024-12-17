@@ -9,7 +9,7 @@ releaseUseGlobalVersion := false
 ThisBuild / versionScheme := Some("semver-spec")
 
 val commonSettings = Def.settings(
-  organization := "org.squeryl",
+  organization := "com.github.novamage",
   javacOptions := {
     if (scala.util.Properties.isJavaAtLeast("17")) {
       Seq("-source", "1.8", "-target", "1.8")
