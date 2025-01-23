@@ -20,6 +20,7 @@ import org.squeryl._
 import dsl.CompositeKey
 import org.squeryl.{Schema, Session, Table}
 import java.sql._
+import java.time._
 import java.util.UUID
 
 trait DatabaseAdapter {
@@ -220,11 +221,16 @@ trait DatabaseAdapter {
   def booleanTypeDeclaration = "boolean"
   def doubleTypeDeclaration = "double"
   def dateTypeDeclaration = "date"
+  def localDateTypeDeclaration = "date"
+  def localTimeTypeDeclaration = "time"
   def longTypeDeclaration = "bigint"
   def floatTypeDeclaration = "real"
   def bigDecimalTypeDeclaration = "decimal"
   def bigDecimalTypeDeclaration(precision: Int, scale: Int) = "decimal(" + precision + "," + scale + ")"
   def timestampTypeDeclaration = "timestamp"
+  def localDateTimeTypeDeclaration = "timestamp"
+  def offsetTimeTypeDeclaration = "time"
+  def offsetDateTimeTypeDeclaration = "timestamp"
   def binaryTypeDeclaration = "binary"
   def uuidTypeDeclaration = "char(36)"
   def intArrayTypeDeclaration = intTypeDeclaration + "[]"
@@ -896,8 +902,18 @@ trait DatabaseAdapter {
         stringTypeDeclaration
       else if (ar.isInstanceOf[java.sql.Timestamp])
         timestampTypeDeclaration
+      else if (ar.isInstanceOf[LocalDateTime])
+        localDateTimeTypeDeclaration
+      else if (ar.isInstanceOf[OffsetTime])
+        offsetTimeTypeDeclaration
+      else if (ar.isInstanceOf[OffsetDateTime])
+        offsetDateTimeTypeDeclaration
       else if (ar.isInstanceOf[java.util.Date])
         dateTypeDeclaration
+      else if (ar.isInstanceOf[LocalDate])
+        localDateTypeDeclaration
+      else if (ar.isInstanceOf[LocalTime])
+        localTimeTypeDeclaration
       else if (ar.isInstanceOf[java.lang.Integer])
         intTypeDeclaration
       else if (ar.isInstanceOf[java.lang.Long])
