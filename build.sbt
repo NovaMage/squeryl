@@ -1,4 +1,6 @@
-import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.ReleaseStateTransformations.*
+
+import java.time.Instant
 
 name := "squeryl"
 
@@ -113,7 +115,6 @@ val commonSettings = Def.settings(
                  <url>https://github.com/davewhittaker</url>
                </developer>
              </developers>),
-  publishTo := sonatypePublishToBundle.value,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
   scalaVersion := Scala211
@@ -250,4 +251,12 @@ Compile / sourceGenerators += task {
 Compile / packageSrc / mappings ++= (Compile / managedSources).value.map { f =>
   // to merge generated sources into sources.jar as well
   (f, f.relativeTo((Compile / sourceManaged).value).get.getPath)
+}
+
+
+ThisBuild / publishTo := {
+  if (isSnapshot.value) {
+    val timestamp = Instant.now().toEpochMilli
+    Some("Artifactory Realm" at s"https://magaran.jfrog.io/artifactory/magaran-sbt-dev;build.timestamp=$timestamp")
+  } else Some("Artifactory Realm" at "https://magaran.jfrog.io/artifactory/magaran-sbt-release")
 }
