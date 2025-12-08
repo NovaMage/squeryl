@@ -48,7 +48,6 @@ val commonSettings = Def.settings(
   ),
   parallelExecution := false,
   publishMavenStyle := true,
-  crossScalaVersions := Seq("2.12.20", Scala211, "2.10.7", "2.13.16", "3.3.4"),
   Compile / doc / scalacOptions ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     val hash = sys.process.Process("git rev-parse HEAD").lineStream_!.head
@@ -74,8 +73,6 @@ val commonSettings = Def.settings(
     }
   },
   scalacOptions ++= Seq(
-    "-unchecked",
-    "-deprecation",
     "-feature",
     "-language:implicitConversions",
     "-language:postfixOps",
@@ -117,12 +114,10 @@ val commonSettings = Def.settings(
              </developers>),
   Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
-  scalaVersion := Scala211
+  scalaVersion := "3.3.4"
 )
 
 commonSettings
-
-val Scala211 = "2.11.12"
 
 lazy val unusedWarnings = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value) match {

@@ -15,15 +15,15 @@
  ***************************************************************************** */
 package org.squeryl
 
-import dsl._
-import ast._
-import internals._
+import dsl.*
+import ast.*
+import internals.*
+import org.squeryl.helpers.Discardable
 
 import reflect.ClassTag
 import java.sql.SQLException
 import java.io.PrintWriter
 import java.util.regex.Pattern
-
 import collection.mutable.{ArrayBuffer, HashMap, HashSet}
 import org.squeryl.internals.FieldMapper
 
@@ -618,13 +618,13 @@ class Schema(implicit val fieldMapper: FieldMapper) extends TableDefinitionInSch
     /**
      * Same as {{{table.insert(a)}}}
      */
-    def save =
+    def save: Discardable[Option[Unit]] =
       _performAction(_.insert(a))
 
     /**
      * Same as {{{table.update(a)}}}
      */
-    def update(implicit ked: KeyedEntityDef[A, _]) =
+    def update(implicit ked: KeyedEntityDef[A, _]): Discardable[Option[Unit]] =
       _performAction(_.update(a))
 
   }

@@ -15,9 +15,11 @@
  ***************************************************************************** */
 package org.squeryl.dsl
 
-import org.squeryl.{ForeignKeyDeclaration, Table, Query}
-import collection.mutable.{HashMap, ArrayBuffer}
+import org.squeryl.{ForeignKeyDeclaration, Query, Table}
+
+import collection.mutable.{ArrayBuffer, HashMap}
 import org.squeryl.KeyedEntityDef
+import org.squeryl.helpers.Discardable
 
 trait Relation[L, R] {
 
@@ -252,7 +254,7 @@ trait OneToMany[M] extends Query[M] {
    */
   def associate(m: M): M
 
-  def deleteAll: Int
+  def deleteAll: Discardable[Int]
 }
 
 trait ManyToOne[O] extends Query[O] {
@@ -264,5 +266,5 @@ trait ManyToOne[O] extends Query[O] {
    */
   def assign(one: O): O
 
-  def delete: Boolean
+  def delete: Discardable[Boolean]
 }

@@ -15,12 +15,14 @@
  ***************************************************************************** */
 package org.squeryl.dsl
 
-import ast._
-import boilerplate._
-import fsm._
-import org.squeryl.internals._
-import org.squeryl._
-import java.sql.{SQLException, ResultSet}
+import ast.*
+import boilerplate.*
+import fsm.*
+import org.squeryl.internals.*
+import org.squeryl.*
+import org.squeryl.helpers.Discardable
+
+import java.sql.{ResultSet, SQLException}
 import reflect.ClassTag
 
 trait BaseQueryDsl {
@@ -401,7 +403,7 @@ trait QueryDsl
 
   // implicit def view2QueryAll[A](v: View[A]) = from(v)(a=> select(a))
 
-  def update[A](t: Table[A])(s: A => UpdateStatement): Int = t.update(s)
+  def update[A](t: Table[A])(s: A => UpdateStatement): Discardable[Int] = t.update(s)
 
   def manyToManyRelation[L, R](l: Table[L], r: Table[R])(implicit
     kedL: KeyedEntityDef[L, _],
@@ -721,7 +723,7 @@ trait QueryDsl
 
       new DelegateQuery(q) with OneToMany[M] {
 
-        def deleteAll =
+        def deleteAll: Discardable[Int] =
           rightTable.deleteWhere(m => f(leftSide, m))
 
         def assign(m: M) = {
@@ -755,7 +757,7 @@ trait QueryDsl
           one
         }
 
-        def delete =
+        def delete: Discardable[Boolean] =
           leftTable.deleteWhere(o => f(o, rightSide)) > 0
       }
     }

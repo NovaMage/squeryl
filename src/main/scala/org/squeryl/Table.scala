@@ -15,11 +15,14 @@
  ***************************************************************************** */
 package org.squeryl;
 
-import dsl.ast._
+import dsl.ast.*
 import dsl.{CompositeKey, QueryDsl}
-import internals._
+import internals.*
+
 import java.sql.Statement
 import logging.StackMarker
+import org.squeryl.helpers.Discardable
+
 import collection.mutable.ArrayBuffer
 
 //private [squeryl] object DummySchema extends Schema
@@ -39,7 +42,7 @@ class Table[T] private[squeryl] (
    * @throws SquerylSQLException When a database error occurs or the insert
    * does not result in 1 row
    */
-  def insert(t: T): T = StackMarker.lastSquerylStackFrame {
+  def insert(t: T): Discardable[T] = StackMarker.lastSquerylStackFrame {
 
     val o = _callbacks.beforeInsert(t.asInstanceOf[AnyRef])
     val sess = Session.currentSession
@@ -273,7 +276,7 @@ class Table[T] private[squeryl] (
     _batchedUpdateOrInsert(e, buildFmds _, false, checkOCC)
   }
 
-  def update(s: T => UpdateStatement): Int = {
+  def update(s: T => UpdateStatement): Discardable[Int] = {
 
     val vxn = new ViewExpressionNode(this)
     vxn.sample = posoMetaData.createSample(FieldReferenceLinker.createCallBack(vxn))
@@ -302,7 +305,7 @@ class Table[T] private[squeryl] (
     dba.executeUpdateAndCloseStatement(Session.currentSession, sw)
   }
 
-  def delete(q: Query[T]): Int = {
+  def delete(q: Query[T]): Discardable[Int] = {
 
     val queryAst = q.ast.asInstanceOf[QueryExpressionElements]
     queryAst.inhibitAliasOnSelectElementReference = true
@@ -313,10 +316,12 @@ class Table[T] private[squeryl] (
     _dbAdapter.executeUpdateAndCloseStatement(Session.currentSession, sw)
   }
 
-  def deleteWhere(whereClause: T => LogicalBoolean)(implicit dsl: QueryDsl): Int =
+  def deleteWhere(whereClause: T => LogicalBoolean)(implicit dsl: QueryDsl): Discardable[Int] =
     delete(dsl.from(this)(t => dsl.where(whereClause(t)).select(t)))
 
-  def delete[K](k: K)(implicit ked: KeyedEntityDef[T, K], dsl: QueryDsl, toCanLookup: K => CanLookup): Boolean = {
+  def delete[K](
+    k: K
+  )(implicit ked: KeyedEntityDef[T, K], dsl: QueryDsl, toCanLookup: K => CanLookup): Discardable[Boolean] = {
     import dsl._
     val q = from(this)(a =>
       dsl.where {
@@ -349,7 +354,7 @@ class Table[T] private[squeryl] (
    * @throws SquerylSQLException When a database error occurs or the operation
    * does not result in 1 row
    */
-  def insertOrUpdate(o: T)(implicit ked: KeyedEntityDef[T, _]): T = {
+  def insertOrUpdate(o: T)(implicit ked: KeyedEntityDef[T, _]): Discardable[T] = {
     if (ked.isPersisted(o))
       update(o)
     else
