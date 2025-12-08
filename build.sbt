@@ -248,6 +248,7 @@ Compile / packageSrc / mappings ++= (Compile / managedSources).value.map { f =>
   (f, f.relativeTo((Compile / sourceManaged).value).get.getPath)
 }
 
+releasePublishArtifactsAction := publish.value
 
 ThisBuild / publishTo := {
   if (isSnapshot.value) {
