@@ -40,8 +40,7 @@ val commonSettings = Def.settings(
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    releaseStepCommandAndRemaining("+ publishSigned"),
-    releaseStepCommandAndRemaining("sonatypeBundleRelease"),
+    publishArtifacts,
     setNextVersion,
     commitNextVersion,
     pushChanges
