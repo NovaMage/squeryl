@@ -100,11 +100,15 @@ object Utils {
 
   def enumerationForValue(v: Enumeration#Value): Enumeration = {
 
-    val m = v.getClass.getField("$outer")
-
-    val enu = m.get(v).asInstanceOf[Enumeration]
-
-    enu
+    try {
+      val m = v.getClass.getField("$outer")
+      m.get(v).asInstanceOf[Enumeration]
+    } catch {
+      case _: NoSuchFieldException =>
+        // Scala 3.8 and up
+        val method = v.getClass.getMethod("outerEnum")
+        method.invoke(v).asInstanceOf[Enumeration]
+    }
   }
 }
 
